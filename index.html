@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f1efe9">
+  <title>Jev · 工单判断台</title>
+  <style>
+    :root { color-scheme: light; --ink:#172421; --muted:#69736e; --paper:#f1efe9; --panel:#fbfaf6; --line:#d9d8cf; --green:#275b4b; --lime:#d1e783; --orange:#bd5c35; --mono:ui-monospace,"Cascadia Code",Consolas,monospace; }
+    * { box-sizing:border-box }
+    body { margin:0; background:var(--paper); color:var(--ink); font-family:Inter,"Microsoft YaHei",system-ui,sans-serif; }
+    .shell { max-width:1180px; margin:auto; padding:34px 38px 48px; }
+    header { display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); padding-bottom:18px; }
+    .brand { display:flex; align-items:center; gap:11px; font-size:13px; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+    .mark { width:26px;height:26px;border-radius:50%;background:var(--green);position:relative; }
+    .mark:after { content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:var(--lime);top:6px;right:5px; }
+    .live { font:11px var(--mono); color:var(--green); letter-spacing:.06em; }
+    .hero { display:grid; grid-template-columns:1.05fr .95fr; gap:60px; padding:58px 0 35px; align-items:end; }
+    .eyebrow { color:var(--orange);font:11px var(--mono);letter-spacing:.16em;text-transform:uppercase;margin:0 0 16px; }
+    h1 { font-size:clamp(42px,6vw,72px);line-height:.98;letter-spacing:-.065em;margin:0;max-width:620px;font-weight:680; }
+    h1 span { color:var(--green); }
+    .intro { border-left:2px solid var(--lime);padding:3px 0 3px 18px;color:#52605b;line-height:1.8;font-size:14px;max-width:440px;margin:0 0 4px; }
+    .workspace { display:grid;grid-template-columns:.9fr 1.1fr;gap:16px;align-items:stretch; }
+    .card { background:var(--panel);border:1px solid var(--line);border-radius:5px; }
+    .input-card { padding:24px; }
+    .card-head { display:flex;justify-content:space-between;align-items:center;margin-bottom:22px; }
+    .label {font:11px var(--mono);letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+    .index {font:11px var(--mono);color:#a0a49b;}
+    .input-title {font-size:19px;font-weight:650;margin:0 0 7px;letter-spacing:-.02em;}
+    .help {margin:0;color:var(--muted);font-size:12px;line-height:1.7;}
+    textarea { display:block;width:100%;height:184px;resize:vertical;background:#f5f4ee;border:1px solid var(--line);border-radius:3px;margin:20px 0 12px;padding:15px;color:var(--ink);font:14px/1.75 "Microsoft YaHei",sans-serif;outline:none; }
+    textarea:focus {border-color:var(--green);box-shadow:0 0 0 2px #275b4b18;}
+    .samples {display:flex;gap:7px;flex-wrap:wrap;margin:0 0 20px;}
+    .sample {border:1px solid var(--line);border-radius:99px;background:transparent;color:#5f6964;padding:6px 10px;font-size:11px;cursor:pointer;}
+    .sample:hover {border-color:var(--green);color:var(--green);}
+    .run {width:100%;border:0;border-radius:3px;background:var(--green);color:white;padding:14px 16px;font-size:13px;font-weight:650;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:background .15s;}
+    .run:hover {background:#1e493b}.run:disabled {opacity:.65;cursor:wait}
+    .arrow {font-size:18px;color:var(--lime)}
+    .footnote {font-size:10px;line-height:1.6;color:#888e87;margin:12px 0 0;}
+    .results {padding:24px;min-height:470px;display:flex;flex-direction:column;}
+    .result-top {display:flex;align-items:center;justify-content:space-between;padding-bottom:19px;border-bottom:1px solid var(--line);}
+    .state {display:flex;align-items:center;gap:8px;color:var(--muted);font:11px var(--mono);}
+    .dot {width:7px;height:7px;background:#b9bdb5;border-radius:50%;}.dot.active {background:#67974e;box-shadow:0 0 0 3px #67974e20;}
+    .placeholder {flex:1;display:grid;place-content:center;text-align:center;padding:35px;color:#92988f;}
+    .placeholder .glyph {font:40px var(--mono);color:#c8c9bf;margin-bottom:12px;}
+    .placeholder p {font-size:12px;line-height:1.7;margin:0;}
+    .answer-list {display:grid;gap:0;}
+    .answer {padding:20px 0 17px;border-bottom:1px solid var(--line);}
+    .answer:last-child {border-bottom:0;}
+    .answer-head {display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;}
+    .answer-name {font:11px var(--mono);letter-spacing:.08em;color:var(--muted);text-transform:uppercase;}
+    .answer-kind {font-size:10px;color:#9a9f97;border:1px solid var(--line);padding:3px 6px;border-radius:2px;}
+    .answer-value {font-size:20px;font-weight:650;letter-spacing:-.035em;}
+    .answer-sub {font-size:12px;color:var(--muted);margin-top:5px;}
+    .prob-list {display:grid;gap:8px;margin-top:13px;}
+    .prob-row {display:grid;grid-template-columns:100px 1fr 46px;gap:9px;align-items:center;font-size:11px;color:#69736e;}
+    .bar {height:5px;background:#e9e8df;border-radius:5px;overflow:hidden;}
+    .bar i {display:block;height:100%;background:var(--green);border-radius:5px;}
+    .prob-value {font:10px var(--mono);text-align:right;color:#58635e;}
+    .error {padding:16px;background:#fbefea;border:1px solid #e8c9bb;color:#873f26;border-radius:3px;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+    details {border-top:1px solid var(--line);padding-top:13px;margin-top:auto;}
+    summary {cursor:pointer;color:var(--muted);font:10px var(--mono);letter-spacing:.08em;}
+    pre {white-space:pre-wrap;word-break:break-word;font:10px/1.6 var(--mono);color:#59635e;background:#f4f3ed;padding:12px;border-radius:3px;max-height:200px;overflow:auto;}
+    .bottom {display:flex;justify-content:space-between;align-items:center;margin-top:16px;color:#92978f;font:10px var(--mono);}
+    @media(max-width:760px){.shell{padding:22px 17px 32px}.hero{grid-template-columns:1fr;gap:22px;padding:42px 0 25px}.workspace{grid-template-columns:1fr}.results{min-height:400px}h1{font-size:52px}.intro{font-size:13px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header><div class="brand"><span class="mark"></span> Decision Lab <span style="color:#9ca39b;font-weight:450">/ Jev</span></div><div class="live">OPENROUTER · LOCAL DEMO</div></header>
+    <section class="hero">
+      <div><p class="eyebrow">Typed decisions for real workflows</p><h1>让工单<br><span>直接变成判断。</span></h1></div>
+      <p class="intro">输入一条客户工单，观察 Jev 如何按你定义的业务标准，同时给出团队归属、退款意图和问题严重度。判断结果来自 OpenRouter 上的 Jev 1.13。</p>
+    </section>
+    <section class="workspace">
+      <div class="card input-card">
+        <div class="card-head"><span class="label">01 / Input</span><span class="index">TICKET</span></div>
+        <h2 class="input-title">客户说了什么？</h2><p class="help">试着换一条工单，看结构化判断怎样变化。</p>
+        <textarea id="ticket" maxlength="4000">同一个订单扣了两次款，请帮我退回多扣的一笔。</textarea>
+        <div class="samples">
+          <button class="sample" data-text="同一个订单扣了两次款，请帮我退回多扣的一笔。">重复扣款</button>
+          <button class="sample" data-text="付款页面一直报错，订单提交不了，今天必须完成采购。">支付故障</button>
+          <button class="sample" data-text="我忘记密码了，收不到重置邮件，没法登录账号。">无法登录</button>
+        </div>
+        <button class="run" id="run"><span>运行 Jev 判断</span><span class="arrow">↗</span></button>
+        <p class="footnote">演示只生成判断，不会执行退款或修改业务数据。请勿输入真实客户隐私。</p>
+      </div>
+      <div class="card results">
+        <div class="result-top"><span class="label">02 / Decision output</span><span class="state"><i class="dot" id="dot"></i><span id="status">等待输入</span></span></div>
+        <div id="output" class="placeholder"><div><div class="glyph">{·}</div><p>运行后，这里会显示<br>Jev 返回的 typed decisions。</p></div></div>
+        <details id="raw-wrap" hidden><summary>查看 OpenRouter 原始响应</summary><pre id="raw"></pre></details>
+      </div>
+    </section>
+    <div class="bottom"><span>MODEL · typesafe/jev-1.13</span><span>CHOICE + NOUL + SCORE</span></div>
+  </main>
+  <script>
+    const ticket = document.querySelector('#ticket');
+    const output = document.querySelector('#output');
+    const run = document.querySelector('#run');
+    const status = document.querySelector('#status');
+    const dot = document.querySelector('#dot');
+    const rawWrap = document.querySelector('#raw-wrap');
+    const raw = document.querySelector('#raw');
+    document.querySelectorAll('.sample').forEach(button => button.addEventListener('click', () => { ticket.value = button.dataset.text; ticket.focus(); }));
+
+    function esc(value) { return String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function pct(value) { const n = Number(value); return `${(n <= 1 ? n * 100 : n).toFixed(1)}%`; }
+    function probabilityRows(probabilities) {
+      if (!probabilities || typeof probabilities !== 'object') return '';
+      return `<div class="prob-list">${Object.entries(probabilities).map(([key,value]) => {
+        const n = Math.max(0, Math.min(100, Number(value) <= 1 ? Number(value) * 100 : Number(value)));
+        return `<div class="prob-row"><span>${esc(key)}</span><span class="bar"><i style="width:${n}%"></i></span><span class="prob-value">${pct(value)}</span></div>`;
+      }).join('')}</div>`;
+    }
+    function card(title, kind, value, sub, probs) {
+      return `<article class="answer"><div class="answer-head"><span class="answer-name">${esc(title)}</span><span class="answer-kind">${esc(kind)}</span></div><div class="answer-value">${esc(value)}</div>${sub ? `<div class="answer-sub">${esc(sub)}</div>` : ''}${probabilityRows(probs)}</article>`;
+    }
+    function showResult(result) {
+      const a = result.answers || {};
+      const team = a.team || {};
+      const refund = a.refund_intent || {};
+      const severity = a.severity || {};
+      const teamNames = {billing:'账单与支付',technical:'技术支持',account:'账号支持',other:'其他 / 待确认'};
+      const teamValue = teamNames[team.choice] || team.choice || '未返回';
+      const score = severity.score;
+      const scoreLabels = {1:'轻微影响',2:'部分功能受影响',3:'核心流程不可用'};
+      const refundValue = Number(refund.noul);
+      const cards = [
+        card('处理团队','CHOICE',teamValue,team.choice ? `模型选项：${team.choice}${team.confidence != null ? ` · 置信度 ${pct(team.confidence)}` : ''}` : '',team.probabilities),
+        card('明确退款诉求','NOUL',Number.isFinite(refundValue) ? pct(refundValue) : (refund.noul ?? '未返回'),'退款意图为“是”的概率'),
+        card('问题严重度','SCORE',score != null ? `${score} / 3` : '未返回',score != null ? (scoreLabels[score] || '按自定义标准评分') : '',severity.probabilities)
+      ].join('');
+      output.className = 'answer-list'; output.innerHTML = cards;
+      raw.textContent = JSON.stringify(result, null, 2); rawWrap.hidden = false;
+    }
+    run.addEventListener('click', async () => {
+      if (!ticket.value.trim()) { ticket.focus(); return; }
+      run.disabled = true; run.querySelector('span:first-child').textContent = '正在请求 Jev…';
+      status.textContent = '请求中'; dot.classList.add('active'); rawWrap.hidden = true;
+      output.className = 'placeholder'; output.innerHTML = '<div><div class="glyph">…</div><p>正在通过 OpenRouter 获取判断结果。</p></div>';
+      try {
+        const response = await fetch('/api/decision', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ticket:ticket.value.trim()})});
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+        showResult(result); status.textContent = '已完成';
+      } catch (error) {
+        output.className = ''; output.innerHTML = `<div class="error">${esc(error.message)}<br><br>确认启动服务的终端已设置 OPENROUTER_API_KEY，并检查 OpenRouter 账号与网络。</div>`;
+        status.textContent = '调用失败';
+      } finally { run.disabled = false; run.querySelector('span:first-child').textContent = '运行 Jev 判断'; }
+    });
+  </script>
+</body>
+</html>
