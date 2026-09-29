@@ -15,6 +15,12 @@ PORT = 8765
 API_URL = "https://openrouter.ai/api/alpha/decisions"
 MODEL = "typesafe/jev-1.13"
 ROOT = Path(__file__).resolve().parent
+DIRECTIONS = {
+    "up": "向上移动一格",
+    "right": "向右移动一格",
+    "down": "向下移动一格",
+    "left": "向左移动一格",
+}
 
 
 def build_payload(ticket: str) -> dict:
@@ -45,6 +51,32 @@ def build_payload(ticket: str) -> dict:
                     "核心流程不可用，且没有可行替代办法",
                 ],
             },
+        },
+    }
+
+
+def build_snake_payload(game_state: dict) -> dict:
+    legal_moves = game_state.get("legal_moves")
+    if not isinstance(legal_moves, list) or not legal_moves:
+        raise ValueError("贪吃蛇状态中没有可选方向。")
+
+    candidates = {direction: DIRECTIONS[direction] for direction in legal_moves if direction in DIRECTIONS}
+    if not candidates:
+        raise ValueError("贪吃蛇状态中没有有效方向。")
+
+    return {
+        "model": MODEL,
+        "state": game_state,
+        "questions": {
+            "move": {
+                "type": "choice",
+                "instructions": (
+                    "你正在自动操控贪吃蛇。根据棋盘、蛇身、食物和当前方向，"
+                    "选择下一步方向。优先靠近食物，同时避免撞墙或撞到蛇身。"
+                    "只能从提供的合法候选方向中选择；不要解释，不要输出候选之外的值。"
+                ),
+                "criteria": candidates,
+            }
         },
     }
 
@@ -93,7 +125,7 @@ class DemoHandler(BaseHTTPRequestHandler):
         self.wfile.write(body)
 
     def do_POST(self) -> None:
-        if self.path != "/api/decision":
+        if self.path not in ("/api/decision", "/api/snake/move"):
             self.send_error(404)
             return
         api_key = os.environ.get("OPENROUTER_API_KEY", "").strip()
@@ -106,11 +138,19 @@ class DemoHandler(BaseHTTPRequestHandler):
                 self._json(413, {"error": "输入内容太长，请控制在 16000 字节以内。"})
                 return
             data = json.loads(self.rfile.read(length).decode("utf-8"))
-            ticket = str(data.get("ticket", "")).strip()
-            if not ticket:
-                self._json(400, {"error": "请先输入一条工单内容。"})
-                return
-            result = call_jev(api_key, build_payload(ticket))
+            if self.path == "/api/decision":
+                ticket = str(data.get("ticket", "")).strip()
+                if not ticket:
+                    self._json(400, {"error": "请先输入一条工单内容。"})
+                    return
+                payload = build_payload(ticket)
+            else:
+                game_state = data.get("state")
+                if not isinstance(game_state, dict):
+                    self._json(400, {"error": "贪吃蛇状态格式不正确。"})
+                    return
+                payload = build_snake_payload(game_state)
+            result = call_jev(api_key, payload)
             self._json(200, result)
         except (ValueError, UnicodeDecodeError, json.JSONDecodeError) as exc:
             self._json(400, {"error": f"请求格式不正确：{exc}"})

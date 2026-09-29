@@ -62,17 +62,48 @@
     summary {cursor:pointer;color:var(--muted);font:10px var(--mono);letter-spacing:.08em;}
     pre {white-space:pre-wrap;word-break:break-word;font:10px/1.6 var(--mono);color:#59635e;background:#f4f3ed;padding:12px;border-radius:3px;max-height:200px;overflow:auto;}
     .bottom {display:flex;justify-content:space-between;align-items:center;margin-top:16px;color:#92978f;font:10px var(--mono);}
-    @media(max-width:760px){.shell{padding:22px 17px 32px}.hero{grid-template-columns:1fr;gap:22px;padding:42px 0 25px}.workspace{grid-template-columns:1fr}.results{min-height:400px}h1{font-size:52px}.intro{font-size:13px}}
+    .topbar {display:flex;align-items:center;gap:28px}
+    .mode-switch {display:flex;gap:5px;background:#e8e7df;padding:4px;border-radius:3px}
+    .mode-tab {border:0;background:transparent;color:#737b75;padding:8px 12px;border-radius:2px;font-size:11px;cursor:pointer}
+    .mode-tab.active {background:var(--panel);color:var(--green);box-shadow:0 1px 2px #17242114;font-weight:700}
+    .demo-panel[hidden] {display:none}
+    .snake-layout {display:grid;grid-template-columns:.78fr 1.22fr;gap:16px}
+    .snake-console {padding:24px;background:#183b31;color:#f1f1e8;border-color:#183b31;position:relative;overflow:hidden}
+    .snake-console:after {content:"";position:absolute;width:230px;height:230px;border:1px solid #ffffff14;border-radius:50%;right:-130px;top:180px;box-shadow:0 0 0 25px #ffffff08,0 0 0 55px #ffffff05;pointer-events:none}
+    .snake-console .label {color:#a9bcb1}.snake-console .index {color:#c6d1c9}
+    .snake-console h2 {font-size:25px;line-height:1.1;letter-spacing:-.04em;margin:0 0 10px;max-width:250px}
+    .snake-copy {color:#c4d1ca;font-size:12px;line-height:1.8;margin:0 0 24px;max-width:290px}
+    .snake-stats {display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #ffffff24;border-bottom:1px solid #ffffff24;padding:14px 0;margin-bottom:20px;position:relative;z-index:1}
+    .snake-stat {display:grid;gap:5px;border-right:1px solid #ffffff24;padding-left:12px}.snake-stat:first-child{padding-left:0}.snake-stat:last-child{border:0}
+    .snake-stat b {font:22px var(--mono);font-weight:500;color:var(--lime)}.snake-stat span{font:9px var(--mono);letter-spacing:.07em;color:#b4c5bb}
+    .snake-actions {display:grid;grid-template-columns:1fr auto;gap:8px;position:relative;z-index:1}
+    .snake-button {border:1px solid #ffffff40;border-radius:3px;background:transparent;color:#f1f1e8;padding:12px 14px;font-size:12px;cursor:pointer}
+    .snake-button.primary {background:var(--lime);border-color:var(--lime);color:#183b31;font-weight:750}.snake-button:disabled{opacity:.55;cursor:wait}
+    .snake-note {font-size:10px;color:#a9bcb1;line-height:1.65;margin:12px 0 0;position:relative;z-index:1}
+    .snake-stage {padding:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:470px}
+    .board-frame {padding:11px;background:#e9e8df;border:1px solid var(--line);border-radius:4px;box-shadow:0 10px 35px #1724210b}
+    .snake-grid {display:grid;grid-template-columns:repeat(12, minmax(17px, 30px));grid-template-rows:repeat(12, minmax(17px, 30px));gap:2px;width:max-content;background:#d4d7cc;border:2px solid #d4d7cc}
+    .cell {width:clamp(17px,2.5vw,30px);height:clamp(17px,2.5vw,30px);background:#f6f5ef;display:grid;place-items:center}
+    .cell.snake-body {background:#86a595}.cell.snake-head {background:var(--green);color:var(--lime);font-size:15px;font-weight:900}.cell.food:after {content:"";width:48%;height:48%;border-radius:50%;background:var(--orange);box-shadow:0 0 0 3px #bd5c3520}
+    .board-legend {display:flex;gap:17px;align-items:center;margin-top:14px;font-size:10px;color:var(--muted)}
+    .legend-chip {width:8px;height:8px;background:var(--green);display:inline-block;margin-right:6px;border-radius:2px}.legend-chip.food-chip{background:var(--orange);border-radius:50%}
+    .snake-log {width:100%;margin-top:22px;border-top:1px solid var(--line);padding-top:14px}
+    .log-head {display:flex;justify-content:space-between;color:var(--muted);font:10px var(--mono);letter-spacing:.08em;margin-bottom:9px}
+    .log-list {list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:6px;max-height:58px;overflow:auto}
+    .log-list li {font:10px var(--mono);color:#43554c;background:#edf0e8;padding:5px 7px;border-radius:2px}
+    .log-list li.latest {background:#dcebb5;color:#294a34}
+    .snake-warning {font-size:10px;color:#9a725e;margin-top:13px;line-height:1.6;text-align:center}
+    @media(max-width:760px){.shell{padding:22px 17px 32px}.hero{grid-template-columns:1fr;gap:22px;padding:42px 0 25px}.workspace,.snake-layout{grid-template-columns:1fr}.results{min-height:400px}h1{font-size:52px}.intro{font-size:13px}.topbar{gap:12px;align-items:flex-end;flex-direction:column}.snake-grid{grid-template-columns:repeat(12, minmax(17px, 1fr));grid-template-rows:repeat(12, minmax(17px, 1fr))}.cell{width:clamp(17px,5.2vw,30px);height:clamp(17px,5.2vw,30px)}}
   </style>
 </head>
 <body>
   <main class="shell">
-    <header><div class="brand"><span class="mark"></span> Decision Lab <span style="color:#9ca39b;font-weight:450">/ Jev</span></div><div class="live">OPENROUTER · LOCAL DEMO</div></header>
+    <header><div class="brand"><span class="mark"></span> Decision Lab <span style="color:#9ca39b;font-weight:450">/ Jev</span></div><div class="topbar"><nav class="mode-switch" aria-label="Demo 模式"><button class="mode-tab active" data-panel="ticket-panel">工单判断</button><button class="mode-tab" data-panel="snake-panel">自动贪吃蛇</button></nav><div class="live">OPENROUTER · LOCAL DEMO</div></div></header>
     <section class="hero">
-      <div><p class="eyebrow">Typed decisions for real workflows</p><h1>让工单<br><span>直接变成判断。</span></h1></div>
-      <p class="intro">输入一条客户工单，观察 Jev 如何按你定义的业务标准，同时给出团队归属、退款意图和问题严重度。判断结果来自 OpenRouter 上的 Jev 1.13。</p>
+      <div><p class="eyebrow" id="hero-eyebrow">Typed decisions for real workflows</p><h1 id="hero-title">让工单<br><span>直接变成判断。</span></h1></div>
+      <p class="intro" id="hero-intro">输入一条客户工单，观察 Jev 如何按你定义的业务标准，同时给出团队归属、退款意图和问题严重度。判断结果来自 OpenRouter 上的 Jev 1.13。</p>
     </section>
-    <section class="workspace">
+    <section id="ticket-panel" class="demo-panel workspace">
       <div class="card input-card">
         <div class="card-head"><span class="label">01 / Input</span><span class="index">TICKET</span></div>
         <h2 class="input-title">客户说了什么？</h2><p class="help">试着换一条工单，看结构化判断怎样变化。</p>
@@ -91,7 +122,23 @@
         <details id="raw-wrap" hidden><summary>查看 OpenRouter 原始响应</summary><pre id="raw"></pre></details>
       </div>
     </section>
-    <div class="bottom"><span>MODEL · typesafe/jev-1.13</span><span>CHOICE + NOUL + SCORE</span></div>
+    <section id="snake-panel" class="demo-panel snake-layout" hidden>
+      <div class="card snake-console">
+        <div class="card-head"><span class="label">AUTONOMOUS RUN</span><span class="index">NO MANUAL INPUT</span></div>
+        <h2>让 Jev 自己玩一局。</h2>
+        <p class="snake-copy">每一步都会把棋盘、蛇身、食物和当前方向发给 Jev，由它从合法方向中选择下一步。这里没有人工方向键，也没有规则算法代打。</p>
+        <div class="snake-stats"><div class="snake-stat"><b id="snake-score">00</b><span>FOOD</span></div><div class="snake-stat"><b id="snake-step">00</b><span>JEV MOVES</span></div><div class="snake-stat"><b id="snake-state">READY</b><span>STATUS</span></div></div>
+        <div class="snake-actions"><button id="snake-start" class="snake-button primary">让 Jev 自动开始 ↗</button><button id="snake-reset" class="snake-button">重置</button></div>
+        <p class="snake-note">按下开始后自动连续运行。暂停后可继续；撞墙、撞到蛇身、达到本局 40 步上限或 API 报错时停止。</p>
+      </div>
+      <div class="card snake-stage">
+        <div class="board-frame"><div id="snake-board" class="snake-grid" role="img" aria-label="自动贪吃蛇棋盘"></div></div>
+        <div class="board-legend"><span><i class="legend-chip"></i>Jev 控制的蛇</span><span><i class="legend-chip food-chip"></i>食物</span></div>
+        <div class="snake-log"><div class="log-head"><span>JEV DECISION TRACE</span><span id="snake-log-count">0 / 40</span></div><ol id="snake-log" class="log-list"><li>等待自动运行</li></ol></div>
+        <div id="snake-warning" class="snake-warning">每次移动会产生一次 OpenRouter API 请求和相应费用。</div>
+      </div>
+    </section>
+    <div class="bottom"><span>MODEL · typesafe/jev-1.13</span><span id="bottom-mode">CHOICE + NOUL + SCORE</span></div>
   </main>
   <script>
     const ticket = document.querySelector('#ticket');
@@ -148,6 +195,211 @@
         status.textContent = '调用失败';
       } finally { run.disabled = false; run.querySelector('span:first-child').textContent = '运行 Jev 判断'; }
     });
+
+    const directions = {
+      up: {x:0,y:-1,label:'↑ 上'},
+      right: {x:1,y:0,label:'→ 右'},
+      down: {x:0,y:1,label:'↓ 下'},
+      left: {x:-1,y:0,label:'← 左'}
+    };
+    const opposite = {up:'down',right:'left',down:'up',left:'right'};
+    const boardSize = 12;
+    const maxSnakeSteps = 40;
+    const snakeBoard = document.querySelector('#snake-board');
+    const snakeStart = document.querySelector('#snake-start');
+    const snakeReset = document.querySelector('#snake-reset');
+    const snakeScore = document.querySelector('#snake-score');
+    const snakeStep = document.querySelector('#snake-step');
+    const snakeState = document.querySelector('#snake-state');
+    const snakeLog = document.querySelector('#snake-log');
+    const snakeLogCount = document.querySelector('#snake-log-count');
+    const snakeWarning = document.querySelector('#snake-warning');
+    let snake = [];
+    let food = [];
+    let heading = 'right';
+    let foodCount = 0;
+    let moveCount = 0;
+    let snakeRunning = false;
+    let snakeBusy = false;
+    let snakeFinished = false;
+    let snakeRunId = 0;
+
+    function newSnakeGame() {
+      snakeRunId++;
+      snakeRunning = false;
+      snakeBusy = false;
+      snakeFinished = false;
+      snake = [[4,6],[3,6],[2,6]];
+      food = [8,6];
+      heading = 'right';
+      foodCount = 0;
+      moveCount = 0;
+      snakeWarning.textContent = '每次移动会产生一次 OpenRouter API 请求和相应费用。';
+      snakeLog.innerHTML = '<li>等待自动运行</li>';
+      paintSnake();
+      setSnakeStatus('READY');
+      syncSnakeControls();
+    }
+    function setSnakeStatus(value) {
+      snakeState.textContent = value;
+      snakeScore.textContent = String(foodCount).padStart(2,'0');
+      snakeStep.textContent = String(moveCount).padStart(2,'0');
+      snakeLogCount.textContent = `${moveCount} / ${maxSnakeSteps}`;
+    }
+    function syncSnakeControls() {
+      snakeStart.disabled = snakeBusy || snakeFinished;
+      snakeStart.textContent = snakeFinished ? '本局已结束' : snakeBusy ? 'Jev 正在判断…' : snakeRunning ? '暂停自动运行' : moveCount ? '继续自动运行 ↗' : '让 Jev 自动开始 ↗';
+      snakeReset.disabled = snakeBusy;
+    }
+    function sameCell(a,b) { return a[0] === b[0] && a[1] === b[1]; }
+    function nextCell(head,direction) {
+      const d = directions[direction];
+      return [head[0] + d.x, head[1] + d.y];
+    }
+    function legalMoves() {
+      return Object.keys(directions).filter(direction => {
+        if (snake.length > 1 && direction === opposite[heading]) return false;
+        const next = nextCell(snake[0],direction);
+        if (next[0] < 0 || next[0] >= boardSize || next[1] < 0 || next[1] >= boardSize) return false;
+        const eating = sameCell(next,food);
+        const occupied = eating ? snake : snake.slice(0,-1);
+        return !occupied.some(segment => sameCell(segment,next));
+      });
+    }
+    function paintSnake() {
+      const body = new Map();
+      snake.forEach((part,index) => body.set(`${part[0]},${part[1]}`,index));
+      let cells = '';
+      for (let y=0; y<boardSize; y++) for (let x=0; x<boardSize; x++) {
+        const partIndex = body.get(`${x},${y}`);
+        const isHead = partIndex === 0;
+        const isBody = partIndex !== undefined && !isHead;
+        const isFood = sameCell(food,[x,y]);
+        const glyph = isHead ? ({up:'↑',right:'→',down:'↓',left:'←'}[heading]) : '';
+        cells += `<span class="cell${isHead?' snake-head':''}${isBody?' snake-body':''}${isFood?' food':''}" aria-hidden="true">${glyph}</span>`;
+      }
+      snakeBoard.innerHTML = cells;
+    }
+    function addSnakeLog(direction) {
+      const item = document.createElement('li');
+      item.className = 'latest';
+      item.textContent = `${String(moveCount).padStart(2,'0')} ${directions[direction].label}`;
+      snakeLog.querySelectorAll('.latest').forEach(node => node.classList.remove('latest'));
+      snakeLog.prepend(item);
+      while (snakeLog.children.length > 20) snakeLog.lastElementChild.remove();
+    }
+    function placeFood() {
+      const open = [];
+      for (let y=0;y<boardSize;y++) for (let x=0;x<boardSize;x++) {
+        const candidate = [x,y];
+        if (!snake.some(part => sameCell(part,candidate))) open.push(candidate);
+      }
+      if (!open.length) return false;
+      food = open[Math.floor(Math.random()*open.length)];
+      return true;
+    }
+    function finishSnake(statusText,message) {
+      snakeRunning = false;
+      snakeFinished = true;
+      snakeBusy = false;
+      snakeRunId++;
+      setSnakeStatus(statusText);
+      snakeWarning.textContent = message;
+      syncSnakeControls();
+    }
+    function pauseSnake() {
+      snakeRunning = false;
+      snakeRunId++;
+      setSnakeStatus('PAUSED');
+      syncSnakeControls();
+    }
+    async function runSnake() {
+      if (snakeRunning || snakeBusy || snakeFinished) return;
+      snakeRunning = true;
+      const runId = ++snakeRunId;
+      setSnakeStatus('RUNNING');
+      syncSnakeControls();
+      while (snakeRunning && runId === snakeRunId) {
+        if (moveCount >= maxSnakeSteps) {
+          finishSnake('LIMIT',`已完成 ${maxSnakeSteps} 步演示上限。点“重置”可再玩一局。`);
+          return;
+        }
+        const moves = legalMoves();
+        if (!moves.length) {
+          finishSnake('OVER','没有不会立即撞墙或撞到蛇身的方向，本局结束。点“重置”开始新局。');
+          return;
+        }
+        snakeBusy = true;
+        setSnakeStatus('THINK');
+        syncSnakeControls();
+        try {
+          const state = {
+            board:{width:boardSize,height:boardSize},
+            snake:snake.map(([x,y]) => ({x,y})),
+            food:{x:food[0],y:food[1]},
+            direction:heading,
+            score:foodCount,
+            step:moveCount,
+            legal_moves:moves
+          };
+          const response = await fetch('/api/snake/move',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({state})});
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.error || `HTTP ${response.status}`);
+          if (!snakeRunning || runId !== snakeRunId) {
+            snakeBusy = false;
+            syncSnakeControls();
+            return;
+          }
+          const chosen = result.answers?.move?.choice;
+          if (!moves.includes(chosen)) throw new Error(`Jev 返回了非法方向：${chosen ?? '空值'}。自动运行已停止，没有切换成本地规则。`);
+          const destination = nextCell(snake[0],chosen);
+          const eating = sameCell(destination,food);
+          snake.unshift(destination);
+          if (eating) foodCount++;
+          else snake.pop();
+          heading = chosen;
+          moveCount++;
+          paintSnake();
+          addSnakeLog(chosen);
+          setSnakeStatus('RUNNING');
+          snakeBusy = false;
+          syncSnakeControls();
+          if (eating && !placeFood()) {
+            finishSnake('WIN','蛇占满了整个棋盘，Jev 完成本局！');
+            return;
+          }
+          if (eating) paintSnake();
+          if (moveCount >= maxSnakeSteps) {
+            finishSnake('LIMIT',`已完成 ${maxSnakeSteps} 步演示上限。点“重置”可再玩一局。`);
+            return;
+          }
+        } catch (error) {
+          if (!snakeRunning || runId !== snakeRunId) {
+            snakeBusy = false;
+            syncSnakeControls();
+            return;
+          }
+          finishSnake('API ERR',`${error.message} 自动运行已停止；检查 Key、OpenRouter 余额和网络后重置再试。`);
+          return;
+        }
+        await new Promise(resolve => setTimeout(resolve,350));
+      }
+      snakeBusy = false;
+      syncSnakeControls();
+    }
+    snakeStart.addEventListener('click', () => snakeRunning ? pauseSnake() : runSnake());
+    snakeReset.addEventListener('click', newSnakeGame);
+    document.querySelectorAll('.mode-tab').forEach(tab => tab.addEventListener('click', () => {
+      if (snakeRunning) pauseSnake();
+      document.querySelectorAll('.mode-tab').forEach(item => item.classList.toggle('active',item === tab));
+      document.querySelectorAll('.demo-panel').forEach(panel => { panel.hidden = panel.id !== tab.dataset.panel; });
+      const snakeMode = tab.dataset.panel === 'snake-panel';
+      document.querySelector('#hero-eyebrow').textContent = snakeMode ? 'Autonomous play · every move by Jev' : 'Typed decisions for real workflows';
+      document.querySelector('#hero-title').innerHTML = snakeMode ? '让蛇自己<br><span>判断下一步。</span>' : '让工单<br><span>直接变成判断。</span>';
+      document.querySelector('#hero-intro').textContent = snakeMode ? '这不是预设路线演示：每一步的方向都由 Jev 通过 OpenRouter Decisions API 选出，页面只执行它返回的合法动作。' : '输入一条客户工单，观察 Jev 如何按你定义的业务标准，同时给出团队归属、退款意图和问题严重度。判断结果来自 OpenRouter 上的 Jev 1.13。';
+      document.querySelector('#bottom-mode').textContent = snakeMode ? 'AUTOPLAY · JEV CHOOSES EVERY MOVE' : 'CHOICE + NOUL + SCORE';
+    }));
+    newSnakeGame();
   </script>
 </body>
 </html>
